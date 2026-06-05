@@ -65,6 +65,7 @@ default chapter_id = "chapter_01"
 default scene_id = "scene_room_test"
 default scene_title = "测试房间"
 default current_objective = "调查房间，确认手机和桌子。"
+default generated_hotspot_return_label = "test_generated_hotspots"
 
 
 # ===== 房间探索热区 screen =====
@@ -224,6 +225,7 @@ label start:
 
 label test_generated_hotspots:
 
+    $ generated_hotspot_return_label = "test_generated_hotspots"
     scene bg_rainy_room
     call screen hotspots_scene_bg_room_rainy
 
@@ -232,7 +234,11 @@ label test_generated_hotspots:
 label test_label:
 
     n "你点击了 AVGBuilder 生成的测试热区。"
-    jump test_generated_hotspots
+    jump expression generated_hotspot_return_label
+
+label return_to_generated_hotspots:
+
+    jump expression generated_hotspot_return_label
 
 label chapter_01_start:
     call set_scene_room_test
