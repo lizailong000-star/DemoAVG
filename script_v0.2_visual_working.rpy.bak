@@ -1,0 +1,114 @@
+# DemoAVG v0.2 - 增加表现层（灰暗房间 + 手机屏幕亮屏 + 铃响闪烁）
+# 保留 v0.1 全部功能：中文显示、雨声循环、电话铃声、分支选择
+
+init 0 python:
+    # 最高优先级强制中文字体配置（simhei.ttf 已验证可用）
+    style.default.font = "simhei.ttf"
+    style.say_dialogue.font = "simhei.ttf"
+    style.say_label.font = "simhei.ttf"
+    style.menu_choice.font = "simhei.ttf"
+
+# ===== 内置占位图层（不依赖外部图片）=====
+
+# 暗灰房间背景（深灰带一点蓝调，营造夜晚雨夜氛围）
+image bg_room_dark = Solid("#1a1c22", xysize=(1280, 720))
+
+# 角色立绘占位
+image char_placeholder = Solid("#222222", xysize=(420, 720))
+
+# 手机屏幕占位（位于右下角的小发光矩形）
+# 熄屏状态：深色
+image phone_off = Solid("#0a0a0a", xysize=(80, 140))
+# 亮屏状态：冷白色发光（来电时显示）
+image phone_on = Solid("#e8f0ff", xysize=(80, 140))
+# 铃响时的橙黄高亮（模拟来电闪烁）
+image phone_ring_flash = Solid("#ffcc66", xysize=(80, 140))
+
+# ===== 角色和变量定义 =====
+
+define n = Character(None) # 旁白
+define l = Character("周明", color="#c8c8c8") # 角色
+
+default phone_answered = False
+
+# ===== 主流程 =====
+
+label start:
+
+    # 暗灰房间背景
+    scene bg_room_dark with fade
+
+    # 播放循环雨声
+    play music "audio/rain_loop.wav" loop fadein 1.0
+
+    # 开场旁白
+    n "雨声在窗外敲打着窗户，夜色潮湿而阴沉。"
+    n "房间里只有手机屏幕发出微弱的光。"
+
+    # 手机亮屏（右下角小发光矩形）
+    show phone_on:
+        xpos 1150 ypos 530
+    with dissolve
+
+    # 立绘出现
+    show char_placeholder at center
+
+    l "这么晚，谁会打电话过来？"
+
+    # 电话铃声响起
+    play sound "audio/phone_ring.wav"
+
+    # 手机闪烁效果（橙黄/冷白交替 3 次，模拟来电闪烁）
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.25
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.25
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.25
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.25
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.25
+    show phone_on:
+        xpos 1150 ypos 530
+
+    # 玩家选择
+    menu:
+        "接电话":
+            $ phone_answered = True
+            jump answer_phone
+
+        "不接电话":
+            $ phone_answered = False
+            jump ignore_phone
+
+label answer_phone:
+
+    scene bg_room_dark
+    # 手机熄屏（接听后）
+    show phone_off:
+        xpos 1150 ypos 530
+
+    n "你接起电话，电话那头却是一片寂静。"
+    l "喂？有人吗？"
+    n "几秒钟后，一个低沉的声音透过听筒响起："
+    n "“不要去养老院……”"
+
+    return
+
+label ignore_phone:
+
+    scene bg_room_dark
+    # 手机熄屏（未接听后）
+    show phone_off:
+        xpos 1150 ypos 530
+
+    n "你选择不接电话，铃声慢慢停下。"
+    n "但几秒后，门外传来了轻微的敲门声，让人不寒而栗。"
+
+    return

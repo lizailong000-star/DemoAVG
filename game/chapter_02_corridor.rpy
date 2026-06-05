@@ -1,0 +1,272 @@
+﻿# ===== 第二章：养老院走廊 =====
+
+# ----- 场景设置 -----
+label set_scene_chapter02_corridor:
+    $ chapter_id = "chapter_02"
+    $ scene_id = "scene_nursing_home_corridor"
+    $ scene_title = "养老院走廊"
+    $ current_objective = "调查走廊，确认是谁在门外叫住周卫国。"
+    return
+
+# ----- 第二章入口 -----
+label chapter_02_start:
+
+    call set_scene_chapter02_corridor
+    jump corridor_intro_scene
+
+# ----- 第二章开场过渡 -----
+label corridor_intro_scene:
+
+    scene black with fade
+    pause 0.5
+
+    scene bg_corridor with dissolve
+    pause 0.4
+
+    n "女人站在活动室门口，手里夹着一本登记簿。"
+    n "她没有马上进来，只是看着周卫国。"
+    n "走廊里的灯一闪一闪。"
+    n "雨声隔着窗户压进来。"
+
+    jump corridor_investigation_intro
+
+# ----- 走廊 intro -----
+label corridor_investigation_intro:
+    scene bg_corridor with dissolve
+    n "走廊比活动室更冷。"
+    n "墙边贴着几张护理通知，纸角都卷了起来。"
+    n "你决定先看看周围。"
+    jump corridor_investigation
+
+# ----- 走廊专属变量 -----
+default clue_corridor_notice_checked = False
+default clue_corridor_wet_floor_checked = False
+default clue_corridor_nurse_station_checked = False
+default clue_corridor_camera_checked = False
+
+# ----- 走廊探索 screen -----
+screen corridor_explore_screen():
+
+    $ corridor_investigated_count = int(clue_corridor_notice_checked) + int(clue_corridor_wet_floor_checked) + int(clue_corridor_nurse_station_checked) + int(clue_corridor_camera_checked)
+    $ corridor_key_ready = clue_corridor_wet_floor_checked and clue_corridor_camera_checked
+
+    # 顶部标题栏
+    frame at soft_fade_in:
+        xalign 0.5
+        yalign 0.03
+        background Solid("#000000")
+        padding (18, 10)
+        vbox:
+            spacing 4
+            xalign 0.5
+            text "[scene_title]" size 26 color "#ffcc66"
+            text "[current_objective]" size 18 color "#ffffff"
+
+    # 左上角：调查进度面板
+    frame at soft_fade_in:
+        xalign 0.02
+        yalign 0.03
+        background Solid("#000000")
+        padding (14, 10)
+        vbox:
+            spacing 5
+            text "调查进度：[corridor_investigated_count] / 4" size 18 color "#ffcc66"
+            text ("护理通知：" + ("已调查" if clue_corridor_notice_checked else "未调查")) size 16 color ("#66ccff" if clue_corridor_notice_checked else "#ffffff")
+            text ("地上水迹：" + ("已调查" if clue_corridor_wet_floor_checked else "未调查")) size 16 color ("#66ccff" if clue_corridor_wet_floor_checked else "#ffffff")
+            text ("护士站：" + ("已调查" if clue_corridor_nurse_station_checked else "未调查")) size 16 color ("#66ccff" if clue_corridor_nurse_station_checked else "#ffffff")
+            text ("监控探头：" + ("已调查" if clue_corridor_camera_checked else "未调查")) size 16 color ("#66ccff" if clue_corridor_camera_checked else "#ffffff")
+
+    # 右上角：当前目标提示
+    frame at soft_fade_in:
+        xalign 0.98
+        yalign 0.03
+        background Solid("#000000")
+        padding (14, 10)
+        vbox:
+            spacing 6
+            text "当前目标" size 18 color "#ffcc66"
+            if corridor_key_ready:
+                text "关键线索已满足" size 16 color "#66ccff"
+                text "可以结束调查" size 16 color "#ffffff"
+            else:
+                text "继续调查走廊" size 16 color "#ffffff"
+                text "重点确认水迹和监控" size 16 color "#ffffff"
+
+    # 护理通知调查按钮
+    button at hover_pulse:
+        xpos 120
+        ypos 140
+        xysize (260, 180)
+        background Solid("#1f3a44" if clue_corridor_notice_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_corridor_notice")
+        tooltip ("墙上的护理通知（已调查）" if clue_corridor_notice_checked else "墙上的护理通知（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "护理通知" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_corridor_notice_checked else "可调查") size 18 color ("#66ccff" if clue_corridor_notice_checked else "#ffcc66") xalign 0.5
+
+    # 地上水迹调查按钮
+    button at hover_pulse:
+        xpos 430
+        ypos 520
+        xysize (300, 120)
+        background Solid("#1f3a44" if clue_corridor_wet_floor_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_corridor_wet_floor")
+        tooltip ("地上的水迹（已调查）" if clue_corridor_wet_floor_checked else "地上的水迹（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "地上水迹" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_corridor_wet_floor_checked else "可调查") size 18 color ("#66ccff" if clue_corridor_wet_floor_checked else "#ffcc66") xalign 0.5
+
+    # 护士站窗口调查按钮
+    button at hover_pulse:
+        xpos 780
+        ypos 170
+        xysize (300, 190)
+        background Solid("#1f3a44" if clue_corridor_nurse_station_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_corridor_nurse_station")
+        tooltip ("护士站窗口（已调查）" if clue_corridor_nurse_station_checked else "护士站窗口（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "护士站" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_corridor_nurse_station_checked else "可调查") size 18 color ("#66ccff" if clue_corridor_nurse_station_checked else "#ffcc66") xalign 0.5
+
+    # 监控探头调查按钮
+    button at hover_pulse:
+        xpos 1040
+        ypos 70
+        xysize (170, 130)
+        background Solid("#1f3a44" if clue_corridor_camera_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_corridor_camera")
+        tooltip ("走廊监控探头（已调查）" if clue_corridor_camera_checked else "走廊监控探头（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "监控探头" size 22 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_corridor_camera_checked else "可调查") size 16 color ("#66ccff" if clue_corridor_camera_checked else "#ffcc66") xalign 0.5
+
+    # tooltip 显示区
+    $ t = GetTooltip()
+    if t:
+        frame:
+            xalign 0.5
+            yalign 0.94
+            background Solid("#000000")
+            padding (16, 8)
+            text "[t]" size 22 color "#ffffff"
+
+    # 查看线索按钮
+    textbutton "查看线索":
+        xalign 0.98
+        yalign 0.84
+        background Solid("#222222")
+        hover_background Solid("#555555")
+        text_color "#ffffff"
+        text_hover_color "#ffcc66"
+        action Show("clue_log_screen")
+
+    # 结束调查按钮
+    textbutton "结束调查":
+        xalign 0.98
+        yalign 0.92
+        background Solid("#222222")
+        hover_background Solid("#555555")
+        text_color "#ffffff"
+        text_hover_color "#ffcc66"
+        action Jump("try_end_corridor_investigation")
+
+# ----- 走廊调查入口 -----
+label corridor_investigation:
+    scene bg_corridor
+    show screen corridor_explore_screen
+    $ renpy.pause(hard=True)
+
+# ----- 调查：护理通知 -----
+label investigate_corridor_notice:
+    hide screen corridor_explore_screen
+    if not clue_corridor_notice_checked:
+        $ clue_corridor_notice_checked = True
+        n "墙上的护理通知被雨气泡得发皱。"
+        n "最下面一行写着：夜间巡视，禁止外人进入二楼。"
+        n "可这行字下面，有人用铅笔轻轻划了一个圈。"
+        $ add_clue("corridor_notice_mark", "被圈出的护理通知", "护理通知上写着夜间巡视，禁止外人进入二楼，下面被人用铅笔圈出。")
+    else:
+        n "那张护理通知还贴在墙上。"
+        n "铅笔圈很浅，不仔细看几乎看不出来。"
+    jump check_corridor_progress
+
+# ----- 调查：地上水迹 -----
+label investigate_corridor_wet_floor:
+    hide screen corridor_explore_screen
+    if not clue_corridor_wet_floor_checked:
+        $ clue_corridor_wet_floor_checked = True
+        n "地上有一串很浅的水印。"
+        n "水印从活动室门口，一直拖到走廊尽头。"
+        n "不像是雨水，更像是有人刚拖过什么东西。"
+        $ add_clue("corridor_wet_floor", "走廊水印", "走廊地面有一串水印，从活动室门口一直拖向走廊尽头。")
+    else:
+        n "水印还没干。"
+        n "拖痕在灯光下面断断续续。"
+    jump check_corridor_progress
+
+# ----- 调查：护士站窗口 -----
+label investigate_corridor_nurse_station:
+    hide screen corridor_explore_screen
+    if not clue_corridor_nurse_station_checked:
+        $ clue_corridor_nurse_station_checked = True
+        n "护士站窗口半开着。"
+        n "里面没有人。"
+        n "登记簿摊在桌上，有一页被折了角。"
+        $ add_clue("nurse_station_register", "折角的登记簿", "护士站登记簿摊开着，其中一页被折了角，像是有人特意留下标记。")
+    else:
+        n "护士站里依旧没人。"
+        n "那本登记簿还摊在原处。"
+    jump check_corridor_progress
+
+# ----- 调查：监控探头 -----
+label investigate_corridor_camera:
+    hide screen corridor_explore_screen
+    if not clue_corridor_camera_checked:
+        $ clue_corridor_camera_checked = True
+        n "走廊尽头有一个监控探头。"
+        n "红灯亮着。"
+        n "但探头的角度偏向墙面，像是被人拧过。"
+        $ add_clue("corridor_camera_angle", "偏向墙面的监控", "走廊监控探头红灯亮着，但角度偏向墙面，似乎被人为调整过。")
+    else:
+        n "监控探头还对着墙。"
+        n "红点一闪一闪，看起来像没坏。"
+    jump check_corridor_progress
+
+# ----- 走廊进度检查 -----
+label check_corridor_progress:
+    jump corridor_investigation
+
+# ----- 走廊结束调查 -----
+label try_end_corridor_investigation:
+    hide screen corridor_explore_screen
+    if clue_corridor_wet_floor_checked and clue_corridor_camera_checked:
+        n "水印和监控探头连在一起，像是有人故意避开了监控。"
+        n "你刚想到这里，护士站里忽然传来翻页声。"
+        jump chapter_02_corridor_end
+    else:
+        n "现在还不能离开。"
+        n "走廊里的异常还没有看清楚。"
+        jump corridor_investigation
+
+# ----- 第二章走廊结尾 -----
+label chapter_02_corridor_end:
+    n "护士站里明明没人。"
+    n "可登记簿自己翻到了一页。"
+    n "那一页上，写着周卫国的名字。"
+    return

@@ -1,0 +1,74 @@
+{
+  "scene": "yangloiyuan",
+  "mask_size": [
+    2089,
+    753
+  ],
+  "reference_size": [
+    2089,
+    753
+  ],
+  "hotspot_count": 4,
+  "hotspots": [
+    {
+      "id": "gate",
+      "color_hex": "#FF0000",
+      "bbox": [
+        380,
+        400,
+        519,
+        699
+      ],
+      "center_x": 449,
+      "center_y": 549,
+      "top_y": 400,
+      "bottom_y": 699,
+      "area_px": 42000
+    },
+    {
+      "id": "notice_board",
+      "color_hex": "#00FF00",
+      "bbox": [
+        820,
+        450,
+        919,
+        649
+      ],
+      "center_x": 869,
+      "center_y": 549,
+      "top_y": 450,
+      "bottom_y": 649,
+      "area_px": 20000
+    },
+    {
+      "id": "security_room",
+      "color_hex": "#0000FF",
+      "bbox": [
+        1260,
+        420,
+        1399,
+        699
+      ],
+      "center_x": 1329,
+      "center_y": 559,
+      "top_y": 420,
+      "bottom_y": 699,
+      "area_px": 39200
+    },
+    {
+      "id": "to_lobby",
+      "color_hex": "#FFFF00",
+      "bbox": [
+        1640,
+        380,
+        1799,
+        719
+      ],
+      "center_x": 1719,
+      "center_y": 549,
+      "top_y": 380,
+      "bottom_y": 719,
+      "area_px": 54400
+    }
+  ]
+}

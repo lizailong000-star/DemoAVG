@@ -1,0 +1,67 @@
+# DemoAVG - 完整最小可玩 Demo（带占位和音效）
+# 中文显示 + 黑屏背景 + 占位立绘 + 雨声循环 + 电话铃声 + 分支
+
+init 0 python:
+    # 最高优先级强制中文字体配置（simhei.ttf 已验证可用）
+    style.default.font = "simhei.ttf"
+    style.say_dialogue.font = "simhei.ttf"
+    style.say_label.font = "simhei.ttf"
+    style.menu_choice.font = "simhei.ttf"
+
+# Ren'Py 内置占位立绘（不依赖外部图片）
+image char_placeholder = Solid("#222222", xysize=(420, 720))
+
+define n = Character(None) # 旁白
+define l = Character("周明", color="#c8c8c8") # 角色
+
+default phone_answered = False # 玩家选择变量
+
+label start:
+
+    # 纯黑背景（不依赖外部图片）
+    scene black with fade
+
+    # 播放循环雨声
+    play music "audio/rain_loop.wav" loop fadein 1.0
+
+    # 开场旁白
+    n "雨声在窗外敲打着窗户，夜色潮湿而阴沉。"
+    n "房间里只有手机屏幕发出微弱的光。"
+
+    # 内置占位立绘
+    show char_placeholder at center
+
+    l "这么晚，谁会打电话过来？"
+
+    # 电话铃声
+    play sound "audio/phone_ring.wav"
+
+    # 玩家选择
+    menu:
+        "接电话":
+            $ phone_answered = True
+            jump answer_phone
+
+        "不接电话":
+            $ phone_answered = False
+            jump ignore_phone
+
+label answer_phone:
+
+    scene black
+
+    n "你接起电话，电话那头却是一片寂静。"
+    l "喂？有人吗？"
+    n "几秒钟后，一个低沉的声音透过听筒响起："
+    n "“不要去养老院……”"
+
+    return
+
+label ignore_phone:
+
+    scene black
+
+    n "你选择不接电话，铃声慢慢停下。"
+    n "但几秒后，门外传来了轻微的敲门声，让人不寒而栗。"
+
+    return

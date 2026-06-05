@@ -1,0 +1,232 @@
+# DemoAVG v0.5 - 章节化结构重构
+# 演出效果与 v0.4 保持一致，仅做 label 结构拆分
+
+init 0 python:
+    # 最高优先级强制中文字体配置（simhei.ttf 已验证可用）
+    style.default.font = "simhei.ttf"
+    style.say_dialogue.font = "simhei.ttf"
+    style.say_label.font = "simhei.ttf"
+    style.menu_choice.font = "simhei.ttf"
+
+# ===== 内置占位图层 =====
+
+image bg_room_dark = Solid("#1a1c22", xysize=(1280, 720))
+image char_placeholder = Solid("#222222", xysize=(420, 720))
+image phone_off = Solid("#0a0a0a", xysize=(80, 140))
+image phone_on = Solid("#e8f0ff", xysize=(80, 140))
+image phone_ring_flash = Solid("#ffcc66", xysize=(80, 140))
+image black_overlay = Solid("#000000", xysize=(1280, 720))
+image phone_glow_strong = Solid("#f4f8ff", xysize=(90, 150))
+
+# ===== 角色和变量定义 =====
+
+define n = Character(None) # 旁白
+define l = Character("周明", color="#c8c8c8") # 角色
+
+default phone_answered = False
+
+# ===== 章节结构 =====
+
+# --- 入口 ---
+label start:
+    jump chapter_01_start
+
+# --- 第一章入口 ---
+label chapter_01_start:
+    jump intro_scene
+
+# --- 开场：黑屏 → 暗灰房间 → 雨声 → 旁白 → 手机第一次亮屏 → 角色出现 ---
+label intro_scene:
+
+    # 开场先全黑
+    scene black with fade
+    pause 0.7
+
+    # 切到暗灰房间
+    scene bg_room_dark with dissolve
+    pause 0.6
+
+    # 雨声渐入，初始音量 0.65
+    play music "audio/rain_loop.wav" loop fadein 2.0
+    $ renpy.music.set_volume(0.65, delay=0.0, channel="music")
+
+    # 第一段旁白
+    n "雨声在窗外敲打着窗户，夜色潮湿而阴沉。"
+    pause 0.6
+
+    # 雨声短暂提高再回落（模拟一阵风雨）
+    $ renpy.music.set_volume(0.8, delay=0.2, channel="music")
+    pause 0.4
+    $ renpy.music.set_volume(0.65, delay=0.3, channel="music")
+
+    # 第二段旁白
+    n "房间里只有手机屏幕发出微弱的光。"
+
+    # 手机亮屏（先亮，闪一下强光，再回到普通亮屏）
+    show phone_on:
+        xpos 1150 ypos 530
+    with dissolve
+    show phone_glow_strong:
+        xpos 1145 ypos 525
+    pause 0.15
+    hide phone_glow_strong
+    show phone_on:
+        xpos 1150 ypos 530
+
+    pause 0.5
+
+    # 立绘出现
+    show char_placeholder at center with dissolve
+
+    l "这么晚，谁会打电话过来？"
+    pause 0.6
+
+    jump phone_event
+
+# --- 电话事件：手机熄屏 → 电话铃响 → 雨声压低 → 手机闪烁 ---
+label phone_event:
+
+    # 电话铃响前，手机熄灭一下再亮起闪烁，制造悬念
+    hide phone_on
+    show phone_off:
+        xpos 1150 ypos 530
+    pause 0.3
+
+    # 电话铃响起，雨声压低
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    play sound "audio/phone_ring.wav"
+    $ renpy.music.set_volume(0.25, delay=0.2, channel="music")
+
+    # 手机闪烁 5 次，每次 0.16 秒
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+
+    # 闪烁结束，亮屏保持
+    show phone_on:
+        xpos 1150 ypos 530
+
+    # 雨声恢复
+    $ renpy.music.set_volume(0.65, delay=0.3, channel="music")
+    pause 0.3
+
+    jump phone_choice
+
+# --- 玩家选择 ---
+label phone_choice:
+
+    menu:
+        "接电话":
+            $ phone_answered = True
+            jump answer_phone
+
+        "不接电话":
+            $ phone_answered = False
+            jump ignore_phone
+
+# --- 分支：接电话 ---
+label answer_phone:
+
+    # 停止铃声
+    stop sound
+
+    # 手机强光闪一下再回到普通亮屏（模拟接通瞬间）
+    show phone_glow_strong:
+        xpos 1145 ypos 525
+    pause 0.2
+    hide phone_glow_strong
+    show phone_on:
+        xpos 1150 ypos 530
+
+    pause 0.5
+
+    n "你把手机贴到耳边，雨声像是一下子远了。"
+
+    # 雨声压低
+    $ renpy.music.set_volume(0.35, delay=0.4, channel="music")
+
+    n "你接起电话，电话那头却是一片寂静。"
+    l "喂？有人吗？"
+
+    # 沉默
+    pause 0.8
+
+    n "几秒钟后，一个低沉的声音透过听筒响起："
+
+    # 低声警告出现前的短暂黑屏过渡
+    scene black with dissolve
+    pause 0.25
+    scene bg_room_dark with dissolve
+    show phone_on:
+        xpos 1150 ypos 530
+
+    n "“不要去养老院……”"
+
+    # 雨声恢复
+    $ renpy.music.set_volume(0.65, delay=0.5, channel="music")
+
+    return
+
+# --- 分支：不接电话 ---
+label ignore_phone:
+
+    # 停止铃声
+    stop sound
+
+    # 手机熄屏
+    hide phone_on
+    hide phone_ring_flash
+    show phone_off:
+        xpos 1150 ypos 530
+    with dissolve
+
+    pause 0.7
+
+    n "手机屏幕暗下去，房间像是突然空了一块。"
+
+    # 雨声短暂提高再降到比开场更低（突显空旷感）
+    $ renpy.music.set_volume(0.85, delay=0.2, channel="music")
+    pause 0.5
+    $ renpy.music.set_volume(0.55, delay=0.3, channel="music")
+
+    pause 0.6
+
+    # 敲门声
+    play sound "audio/knock.wav"
+
+    n "你选择不接电话，铃声慢慢停下。"
+    n "但几秒后，门外传来了轻微的敲门声，让人不寒而栗。"
+
+    pause 0.5
+
+    # 短暂黑屏遮罩（不切场景，只盖一层黑）
+    show black_overlay with dissolve
+    pause 0.25
+    hide black_overlay with dissolve
+
+    n "那三下不像敲门，更像是在确认你还在不在。"
+
+    return

@@ -1,0 +1,22 @@
+﻿{
+  "build": {
+    "allow_internet": false,
+    "include_sdk": false,
+    "package": null,
+    "version": "1.0"
+  },
+  "color": [
+    51,
+    51,
+    51
+  ],
+  "executable": "DemoAVG",
+  "icon": "icon.ico",
+  "name": "DemoAVG",
+  "python": {
+    "home": null,
+    "module": null
+  },
+  "renpy": "8.5.3",
+  "version": "1.0"
+}

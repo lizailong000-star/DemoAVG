@@ -1,0 +1,67 @@
+﻿# v1.6 第一章结尾系统
+
+default chapter_01_finished = False
+
+init python:
+    def get_clue_count():
+        return len(clue_list)
+
+screen chapter_end_screen():
+
+    modal True
+
+    frame at soft_fade_in:
+        xalign 0.5
+        yalign 0.5
+        xsize 840
+        ysize 520
+        background Solid("#111111")
+        padding (28, 24)
+
+        vbox:
+            spacing 18
+            xalign 0.5
+
+            text "第一章结束" size 36 color "#ffcc66" xalign 0.5
+            text "雨夜之后" size 24 color "#ffffff" xalign 0.5
+
+            null height 12
+
+            text "已获得线索：[get_clue_count()] 条" size 22 color "#66ccff" xalign 0.5
+
+            text "周卫国终于走进了养老院。可他还不知道，真正等着他的，并不是一通电话。" size 20 color "#ffffff" xalign 0.5
+
+            null height 20
+
+            hbox:
+                spacing 24
+                xalign 0.5
+
+                textbutton "继续":
+                    background Solid("#333333")
+                    hover_background Solid("#555555")
+                    text_color "#ffffff"
+                    text_hover_color "#ffcc66"
+                    action Jump("chapter_02_placeholder")
+
+                textbutton "返回标题":
+                    background Solid("#333333")
+                    hover_background Solid("#555555")
+                    text_color "#ffffff"
+                    text_hover_color "#ffcc66"
+                    action MainMenu()
+
+label chapter_01_end:
+
+    $ chapter_01_finished = True
+    show screen chapter_end_screen
+    $ renpy.pause(hard=True)
+
+label chapter_02_placeholder:
+
+    hide screen chapter_end_screen
+
+    n "第二章内容尚未制作。"
+    n "这里将进入下一个场景。"
+
+    return

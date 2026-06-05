@@ -1,0 +1,254 @@
+﻿# v1.5 养老院活动室独立调查点系统
+
+default clue_banner_checked = False
+default clue_schedule_checked = False
+default clue_chairs_checked = False
+default clue_bucket_checked = False
+
+screen activity_room_explore_screen():
+
+    $ activity_investigated_count = int(clue_banner_checked) + int(clue_schedule_checked) + int(clue_chairs_checked) + int(clue_bucket_checked)
+    $ activity_key_ready = clue_banner_checked and clue_schedule_checked
+
+    # 顶部标题栏
+    frame at soft_fade_in:
+        xalign 0.5
+        yalign 0.03
+        background Solid("#000000")
+        padding (18, 10)
+        vbox:
+            spacing 4
+            xalign 0.5
+            text "[scene_title]" size 26 color "#ffcc66" xalign 0.5
+            text "[current_objective]" size 18 color "#ffffff" xalign 0.5
+
+    # 左上角：调查进度面板
+    frame at soft_fade_in:
+        xalign 0.02
+        yalign 0.03
+        background Solid("#000000")
+        padding (14, 10)
+        vbox:
+            spacing 5
+            text "调查进度：[activity_investigated_count] / 4" size 18 color "#ffcc66"
+            text ("祝寿字：" + ("已调查" if clue_banner_checked else "未调查")) size 16 color ("#66ccff" if clue_banner_checked else "#ffffff")
+            text ("安排表：" + ("已调查" if clue_schedule_checked else "未调查")) size 16 color ("#66ccff" if clue_schedule_checked else "#ffffff")
+            text ("座椅：" + ("已调查" if clue_chairs_checked else "未调查")) size 16 color ("#66ccff" if clue_chairs_checked else "#ffffff")
+            text ("水桶：" + ("已调查" if clue_bucket_checked else "未调查")) size 16 color ("#66ccff" if clue_bucket_checked else "#ffffff")
+
+    # 右上角：当前目标提示
+    frame at soft_fade_in:
+        xalign 0.98
+        yalign 0.03
+        background Solid("#000000")
+        padding (14, 10)
+        vbox:
+            spacing 6
+            text "当前目标" size 18 color "#ffcc66"
+            if activity_key_ready:
+                text "关键线索已满足" size 16 color "#66ccff"
+                text "可以结束调查" size 16 color "#ffffff"
+            else:
+                text "继续调查活动室" size 16 color "#ffffff"
+                text "重点确认祝寿字和安排表" size 16 color "#ffffff"
+
+    # 墙上"祝寿"字调查按钮
+    button at hover_pulse:
+        xpos 450
+        ypos 90
+        xysize (360, 150)
+        background Solid("#1f3a44" if clue_banner_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_activity_banner")
+        tooltip ("墙上的祝寿字（已调查）" if clue_banner_checked else "墙上的祝寿字（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "祝寿字" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_banner_checked else "可调查") size 18 color ("#66ccff" if clue_banner_checked else "#ffcc66") xalign 0.5
+
+    # 活动安排表调查按钮
+    button at hover_pulse:
+        xpos 870
+        ypos 220
+        xysize (260, 170)
+        background Solid("#1f3a44" if clue_schedule_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_activity_schedule")
+        tooltip ("活动安排表（已调查）" if clue_schedule_checked else "活动安排表（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "安排表" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_schedule_checked else "可调查") size 18 color ("#66ccff" if clue_schedule_checked else "#ffcc66") xalign 0.5
+
+    # 老人座椅调查按钮
+    button at hover_pulse:
+        xpos 260
+        ypos 430
+        xysize (340, 170)
+        background Solid("#1f3a44" if clue_chairs_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_activity_chairs")
+        tooltip ("老人座椅（已调查）" if clue_chairs_checked else "老人座椅（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "老人座椅" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_chairs_checked else "可调查") size 18 color ("#66ccff" if clue_chairs_checked else "#ffcc66") xalign 0.5
+
+    # 角落水桶调查按钮
+    button at hover_pulse:
+        xpos 930
+        ypos 500
+        xysize (220, 140)
+        background Solid("#1f3a44" if clue_bucket_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_activity_bucket")
+        tooltip ("角落水桶（已调查）" if clue_bucket_checked else "角落水桶（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "角落水桶" size 22 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_bucket_checked else "可调查") size 16 color ("#66ccff" if clue_bucket_checked else "#ffcc66") xalign 0.5
+
+    # tooltip 显示区
+    $ t = GetTooltip()
+    if t:
+        frame:
+            xalign 0.5
+            yalign 0.94
+            background Solid("#000000")
+            padding (16, 8)
+            text "[t]" size 22 color "#ffffff"
+
+    # 查看线索按钮
+    textbutton "查看线索":
+        xalign 0.98
+        yalign 0.84
+        background Solid("#222222")
+        hover_background Solid("#555555")
+        text_color "#ffffff"
+        text_hover_color "#ffcc66"
+        action Show("clue_log_screen")
+
+    # 结束调查按钮
+    textbutton "结束调查":
+        xalign 0.98
+        yalign 0.92
+        background Solid("#222222")
+        hover_background Solid("#555555")
+        text_color "#ffffff"
+        text_hover_color "#ffcc66"
+        action Jump("try_end_activity_room_investigation")
+
+# ===== v1.5 养老院活动室专属 label =====
+
+label nursing_home_activity_room_investigation_intro:
+
+    n "活动室里很安静。"
+    n "墙上的“祝寿”两个字，被潮气浸得发暗。"
+    n "你决定先看看这里。"
+
+    jump nursing_home_activity_room_investigation
+
+label nursing_home_activity_room_investigation:
+
+    scene bg_room_dark
+    show screen activity_room_explore_screen
+    $ renpy.pause(hard=True)
+
+label investigate_activity_banner:
+
+    hide screen activity_room_explore_screen
+
+    if not clue_banner_checked:
+        $ clue_banner_checked = True
+        n "墙上的“祝寿”两个字是用红漆刷上去的。"
+        n "但“祝”字左边的墙皮已经起鼓。"
+        n "潮湿的裂纹下面，像是还藏着另一层字。"
+        $ add_clue("activity_banner_crack", "起鼓的祝寿字", "活动室墙上的“祝寿”二字开始起鼓开裂，底下像是还藏着另一层字。")
+    else:
+        n "墙上的“祝寿”两个字还在那里。"
+        n "越看越不像是刚刷上去的。"
+
+    jump check_activity_room_progress
+
+label investigate_activity_schedule:
+
+    hide screen activity_room_explore_screen
+
+    if not clue_schedule_checked:
+        $ clue_schedule_checked = True
+        n "活动安排表贴在门边。"
+        n "上午九点写着：祝寿仪式。"
+        n "可下面还有一行被圆珠笔划掉了。"
+        $ add_clue("activity_schedule_mark", "被划掉的活动安排", "活动安排表上写着上午九点祝寿仪式，下面还有一行内容被圆珠笔划掉了。")
+    else:
+        n "安排表上的那道划痕很重。"
+        n "像是不想让人看见下面原本写了什么。"
+
+    jump check_activity_room_progress
+
+label investigate_activity_chairs:
+
+    hide screen activity_room_explore_screen
+
+    if not clue_chairs_checked:
+        $ clue_chairs_checked = True
+        n "几把塑料椅子靠墙摆着。"
+        n "椅面上有浅浅的水痕。"
+        n "不像是老人刚坐过，更像是有人用湿布急匆匆擦过。"
+        $ add_clue("activity_chairs_water", "被擦过的座椅", "活动室里的塑料椅子上有水痕，像是刚被人用湿布擦过。")
+    else:
+        n "椅子还整齐地靠在墙边。"
+        n "水痕没有完全干。"
+
+    jump check_activity_room_progress
+
+label investigate_activity_bucket:
+
+    hide screen activity_room_explore_screen
+
+    if not clue_bucket_checked:
+        $ clue_bucket_checked = True
+        n "角落里放着一个蓝色塑料水桶。"
+        n "桶底有半桶浑水。"
+        n "水面上漂着一点红色漆皮。"
+        $ add_clue("activity_bucket_paint", "水桶里的红漆皮", "活动室角落的水桶里漂着红色漆皮，像是刚从墙上剥落下来。")
+    else:
+        n "水桶还在角落里。"
+        n "红色漆皮贴着桶壁，像一片薄薄的纸。"
+
+    jump check_activity_room_progress
+
+label check_activity_room_progress:
+
+    jump nursing_home_activity_room_investigation
+
+label try_end_activity_room_investigation:
+
+    hide screen activity_room_explore_screen
+
+    if clue_banner_checked and clue_schedule_checked:
+        n "你站在活动室中央。"
+        n "墙上的“祝寿”字、门边的安排表，都不像是巧合。"
+        n "就在这时，走廊外传来了脚步声。"
+        jump chapter_01_activity_room_end
+    else:
+        n "现在还不能离开。"
+        n "你总觉得这间活动室里还有东西没看。"
+        jump nursing_home_activity_room_investigation
+
+label chapter_01_activity_room_end:
+
+    n "脚步声停在门口。"
+    n "有人在门外轻轻咳了一声。"
+    n "你还没回头，就听见一个女人的声音："
+    n "“你是周卫国？”"
+
+    return

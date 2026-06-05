@@ -1,0 +1,137 @@
+# DemoAVG v0.3 - 演出节奏增强
+# 保留 v0.2 全部功能 + 节奏优化 + 敲门声音效
+
+init 0 python:
+    # 最高优先级强制中文字体配置（simhei.ttf 已验证可用）
+    style.default.font = "simhei.ttf"
+    style.say_dialogue.font = "simhei.ttf"
+    style.say_label.font = "simhei.ttf"
+    style.menu_choice.font = "simhei.ttf"
+
+# ===== 内置占位图层（保留 v0.2 定义）=====
+
+image bg_room_dark = Solid("#1a1c22", xysize=(1280, 720))
+image char_placeholder = Solid("#222222", xysize=(420, 720))
+image phone_off = Solid("#0a0a0a", xysize=(80, 140))
+image phone_on = Solid("#e8f0ff", xysize=(80, 140))
+image phone_ring_flash = Solid("#ffcc66", xysize=(80, 140))
+
+# ===== 角色和变量定义 =====
+
+define n = Character(None) # 旁白
+define l = Character("周明", color="#c8c8c8") # 角色
+
+default phone_answered = False
+
+# ===== 主流程 =====
+
+label start:
+
+    # 开场暗灰房间，缓缓淡入
+    scene bg_room_dark with fade
+    pause 0.8
+
+    # 雨声渐入（1.5 秒淡入）
+    play music "audio/rain_loop.wav" loop fadein 1.5
+
+    # 第一段旁白
+    n "雨声在窗外敲打着窗户，夜色潮湿而阴沉。"
+    pause 0.5
+
+    # 第二段旁白：提到手机亮光
+    n "房间里只有手机屏幕发出微弱的光。"
+
+    # 手机亮屏（右下角小发光矩形，dissolve 出现）
+    show phone_on:
+        xpos 1150 ypos 530
+    with dissolve
+    pause 0.5
+
+    # 立绘出现
+    show char_placeholder at center
+
+    l "这么晚，谁会打电话过来？"
+    pause 0.4
+
+    # 临时降低雨声音量，突出铃声
+    queue music "audio/rain_loop.wav" loop
+    $ renpy.music.set_volume(0.35, delay=0.3, channel="music")
+
+    # 电话铃声响起
+    play sound "audio/phone_ring.wav"
+
+    # 手机闪烁 4 次，节奏 0.18 / 0.18
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.18
+    show phone_on:
+        xpos 1150 ypos 530
+
+    # 闪烁结束，恢复雨声音量
+    $ renpy.music.set_volume(0.75, delay=0.3, channel="music")
+
+    # 玩家选择
+    menu:
+        "接电话":
+            $ phone_answered = True
+            jump answer_phone
+
+        "不接电话":
+            $ phone_answered = False
+            jump ignore_phone
+
+label answer_phone:
+
+    # 保持 bg_room_dark 和 phone_on
+    # 停止电话铃声
+    stop sound
+
+    pause 0.5
+
+    n "电话那头没有立刻说话。"
+    n "你接起电话，电话那头却是一片寂静。"
+    l "喂？有人吗？"
+    n "几秒钟后，一个低沉的声音透过听筒响起："
+    n "“不要去养老院……”"
+
+    return
+
+label ignore_phone:
+
+    # 停止电话铃声
+    stop sound
+
+    # 手机熄屏（隐藏亮屏，显示熄屏，同一位置）
+    hide phone_on
+    show phone_off:
+        xpos 1150 ypos 530
+    with dissolve
+
+    pause 0.8
+
+    # 播放敲门声
+    play sound "audio/knock.wav"
+
+    n "门外响了三下。"
+    n "你选择不接电话，铃声慢慢停下。"
+    n "但几秒后，门外传来了轻微的敲门声，让人不寒而栗。"
+
+    return

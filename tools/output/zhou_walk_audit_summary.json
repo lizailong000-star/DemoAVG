@@ -1,0 +1,270 @@
+{
+  "walk": [
+    {
+      "file": "zhou_explore_walk_01.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_01.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 56,
+      "bbox_top": 26,
+      "bbox_right": 385,
+      "bbox_bottom": 679,
+      "bbox_w": 329,
+      "bbox_h": 653,
+      "center_x": 220.0,
+      "foot_y": 678,
+      "bottom_support": [
+        676,
+        120,
+        138
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": 0.0,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_02.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_02.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 75,
+      "bbox_top": 26,
+      "bbox_right": 365,
+      "bbox_bottom": 679,
+      "bbox_w": 290,
+      "bbox_h": 653,
+      "center_x": 219.5,
+      "foot_y": 678,
+      "bottom_support": [
+        677,
+        273,
+        330
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": -0.5,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_03.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_03.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 45,
+      "bbox_top": 26,
+      "bbox_right": 396,
+      "bbox_bottom": 679,
+      "bbox_w": 351,
+      "bbox_h": 653,
+      "center_x": 220.0,
+      "foot_y": 678,
+      "bottom_support": [
+        677,
+        284,
+        288
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": 0.0,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_04.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_04.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 20,
+      "bbox_top": 26,
+      "bbox_right": 421,
+      "bbox_bottom": 679,
+      "bbox_w": 401,
+      "bbox_h": 653,
+      "center_x": 220.0,
+      "foot_y": 678,
+      "bottom_support": [
+        677,
+        308,
+        311
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": 0.0,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_05.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_05.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 28,
+      "bbox_top": 26,
+      "bbox_right": 412,
+      "bbox_bottom": 679,
+      "bbox_w": 384,
+      "bbox_h": 653,
+      "center_x": 219.5,
+      "foot_y": 678,
+      "bottom_support": [
+        676,
+        109,
+        124
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": -0.5,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_06.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_06.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 68,
+      "bbox_top": 26,
+      "bbox_right": 373,
+      "bbox_bottom": 679,
+      "bbox_w": 305,
+      "bbox_h": 653,
+      "center_x": 220.0,
+      "foot_y": 678,
+      "bottom_support": [
+        677,
+        119,
+        145
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": 0.0,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_07.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_07.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 58,
+      "bbox_top": 26,
+      "bbox_right": 382,
+      "bbox_bottom": 679,
+      "bbox_w": 324,
+      "bbox_h": 653,
+      "center_x": 219.5,
+      "foot_y": 678,
+      "bottom_support": [
+        676,
+        140,
+        153
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": -0.5,
+      "height_delta_vs_01": 0
+    },
+    {
+      "file": "zhou_explore_walk_08.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_walk_08.png",
+      "canvas_w": 441,
+      "canvas_h": 687,
+      "bbox_left": 65,
+      "bbox_top": 26,
+      "bbox_right": 376,
+      "bbox_bottom": 679,
+      "bbox_w": 311,
+      "bbox_h": 653,
+      "center_x": 220.0,
+      "foot_y": 678,
+      "bottom_support": [
+        676,
+        135,
+        290
+      ],
+      "foot_delta_vs_01": 0,
+      "center_delta_vs_01": 0.0,
+      "height_delta_vs_01": 0
+    }
+  ],
+  "idle": [
+    {
+      "file": "zhou_explore_idle_01.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_idle_01.png",
+      "canvas_w": 396,
+      "canvas_h": 687,
+      "bbox_left": 96,
+      "bbox_top": 22,
+      "bbox_right": 299,
+      "bbox_bottom": 679,
+      "bbox_w": 203,
+      "bbox_h": 657,
+      "center_x": 197.0,
+      "foot_y": 678,
+      "bottom_support": [
+        677,
+        147,
+        167
+      ]
+    },
+    {
+      "file": "zhou_explore_idle_02.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_idle_02.png",
+      "canvas_w": 396,
+      "canvas_h": 687,
+      "bbox_left": 94,
+      "bbox_top": 27,
+      "bbox_right": 301,
+      "bbox_bottom": 679,
+      "bbox_w": 207,
+      "bbox_h": 652,
+      "center_x": 197.0,
+      "foot_y": 678,
+      "bottom_support": [
+        678,
+        158,
+        161
+      ]
+    },
+    {
+      "file": "zhou_explore_idle_03.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_idle_03.png",
+      "canvas_w": 396,
+      "canvas_h": 687,
+      "bbox_left": 93,
+      "bbox_top": 27,
+      "bbox_right": 303,
+      "bbox_bottom": 679,
+      "bbox_w": 210,
+      "bbox_h": 652,
+      "center_x": 197.5,
+      "foot_y": 678,
+      "bottom_support": [
+        678,
+        154,
+        165
+      ]
+    },
+    {
+      "file": "zhou_explore_idle_04.png",
+      "path": "D:\\renpy-8.5.3\\DemoAVG\\game\\images\\player\\zhou\\zhou_explore_idle_04.png",
+      "canvas_w": 396,
+      "canvas_h": 687,
+      "bbox_left": 94,
+      "bbox_top": 27,
+      "bbox_right": 301,
+      "bbox_bottom": 679,
+      "bbox_w": 207,
+      "bbox_h": 652,
+      "center_x": 197.0,
+      "foot_y": 678,
+      "bottom_support": [
+        678,
+        144,
+        167
+      ]
+    }
+  ],
+  "pauses": [
+    0.11,
+    0.11,
+    0.11,
+    0.11,
+    0.11,
+    0.11,
+    0.11,
+    0.11
+  ],
+  "gif": "D:\\renpy-8.5.3\\DemoAVG\\tools\\output\\zhou_walk_preview.gif",
+  "contact_sheet": "D:\\renpy-8.5.3\\DemoAVG\\tools\\output\\zhou_walk_contact_sheet.png"
+}

@@ -1,0 +1,547 @@
+# DemoAVG v0.7 - 点击热区探索原型
+# 在 v0.6 基础上，把房间调查从 menu 改为可点击的画面热区
+
+init 0 python:
+    # 最高优先级强制中文字体配置（simhei.ttf 已验证可用）
+    style.default.font = "simhei.ttf"
+    style.say_dialogue.font = "simhei.ttf"
+    style.say_label.font = "simhei.ttf"
+    style.menu_choice.font = "simhei.ttf"
+
+
+# ===== v2.2n: 选项菜单居中样式 =====
+# 把默认 menu 选项做成屏幕中央的半透明横向矩形按钮，避免玩家找不到点哪
+# v2.2o: Hide UI 时同步隐藏 menu choice
+screen choice(items):
+    style_prefix "centered_choice"
+
+    if not dialogue_ui_hidden:
+        vbox:
+            xalign 0.5
+            yalign 0.45
+            spacing 16
+
+            for i in items:
+                textbutton i.caption action i.action
+
+style centered_choice_button is default:
+    xsize 480
+    yminimum 64
+    background Solid("#000000B0")
+    hover_background Solid("#222222CC")
+    padding (24, 16)
+
+style centered_choice_button_text is default:
+    size 24
+    color "#FFFFFF"
+    hover_color "#FFD700"
+    xalign 0.5
+    text_align 0.5
+    font "simhei.ttf"
+
+
+# 热区视觉占位（半透明白色，hover 时显示边框感）
+image hotspot_idle = Solid("#ffffff20")
+image hotspot_hover = Solid("#ffffff60")
+
+# ===== 角色和变量定义 =====
+
+# v2.2o: Hide UI 时，用文本标签 alpha 直接控制当前对白透明度。
+# 变量插值会在每次 interaction 重新解析，比函数型 what_prefix 更稳。
+default dialogue_text_alpha = 1.0
+
+define n = Character(None, callback=dialog_avatar_none, what_prefix="{alpha=[dialogue_text_alpha]}", what_suffix="{/alpha}") # 旁白
+define l = Character("周卫国", color="#c8c8c8", callback=dialog_avatar_zhou, what_prefix="{alpha=[dialogue_text_alpha]}", what_suffix="{/alpha}") # 角色
+
+default phone_answered = False
+
+default clue_phone_checked = False
+default clue_door_checked = False
+default clue_window_checked = False
+default clue_table_checked = False
+
+# v1.2 新增：可扩展场景管理变量
+default chapter_id = "chapter_01"
+default scene_id = "scene_room_test"
+default scene_title = "测试房间"
+default current_objective = "调查房间，确认手机和桌子。"
+
+
+# ===== 房间探索热区 screen =====
+
+screen room_explore_screen():
+
+    $ investigated_count = int(clue_phone_checked) + int(clue_door_checked) + int(clue_window_checked) + int(clue_table_checked)
+    $ key_ready = clue_phone_checked and clue_table_checked
+
+    # 顶部标题栏
+    frame at soft_fade_in:
+        xalign 0.5
+        yalign 0.03
+        background Solid("#000000")
+        padding (18, 10)
+        vbox:
+            spacing 4
+            xalign 0.5
+            text "[scene_title]" size 26 color "#ffcc66" xalign 0.5
+            text "[current_objective]" size 18 color "#ffffff" xalign 0.5
+
+    # 左上角：调查进度面板
+    frame at soft_fade_in:
+        xalign 0.02
+        yalign 0.03
+        background Solid("#000000")
+        padding (14, 10)
+        vbox:
+            spacing 5
+            text "调查进度：[investigated_count] / 4" size 18 color "#ffcc66"
+            text ("手机：" + ("已调查" if clue_phone_checked else "未调查")) size 16 color ("#66ccff" if clue_phone_checked else "#ffffff")
+            text ("门口：" + ("已调查" if clue_door_checked else "未调查")) size 16 color ("#66ccff" if clue_door_checked else "#ffffff")
+            text ("窗户：" + ("已调查" if clue_window_checked else "未调查")) size 16 color ("#66ccff" if clue_window_checked else "#ffffff")
+            text ("桌子：" + ("已调查" if clue_table_checked else "未调查")) size 16 color ("#66ccff" if clue_table_checked else "#ffffff")
+
+    # 右上角：当前目标提示
+    frame at soft_fade_in:
+        xalign 0.98
+        yalign 0.03
+        background Solid("#000000")
+        padding (14, 10)
+        vbox:
+            spacing 6
+            text "当前目标" size 18 color "#ffcc66"
+            if key_ready:
+                text "关键线索已满足" size 16 color "#66ccff"
+                text "可以结束调查" size 16 color "#ffffff"
+            else:
+                text "继续调查房间" size 16 color "#ffffff"
+                text "至少确认手机和桌子" size 16 color "#ffffff"
+
+    # 门口调查按钮
+    button at hover_pulse:
+        xpos 60
+        ypos 120
+        xysize (180, 280)
+        background Solid("#1f3a44" if clue_door_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_door")
+        tooltip ("门口（已调查）" if clue_door_checked else "门口（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "门口" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_door_checked else "可调查") size 18 color ("#66ccff" if clue_door_checked else "#ffcc66") xalign 0.5
+
+    # 窗户调查按钮
+    button at hover_pulse:
+        xpos 500
+        ypos 80
+        xysize (280, 220)
+        background Solid("#1f3a44" if clue_window_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_window")
+        tooltip ("窗户（已调查）" if clue_window_checked else "窗户（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "窗户" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_window_checked else "可调查") size 18 color ("#66ccff" if clue_window_checked else "#ffcc66") xalign 0.5
+
+    # 桌子调查按钮
+    button at hover_pulse:
+        xpos 470
+        ypos 480
+        xysize (340, 160)
+        background Solid("#1f3a44" if clue_table_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_table")
+        tooltip ("桌子（已调查）" if clue_table_checked else "桌子（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "桌子" size 24 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_table_checked else "可调查") size 18 color ("#66ccff" if clue_table_checked else "#ffcc66") xalign 0.5
+
+    # 手机调查按钮
+    button at hover_pulse:
+        xpos 1130
+        ypos 510
+        xysize (120, 180)
+        background Solid("#1f3a44" if clue_phone_checked else "#333333")
+        hover_background Solid("#555555")
+        action Jump("investigate_phone")
+        tooltip ("手机（已调查）" if clue_phone_checked else "手机（可调查）")
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 8
+            text "手机" size 22 color "#ffffff" xalign 0.5
+            text ("已调查" if clue_phone_checked else "可调查") size 16 color ("#66ccff" if clue_phone_checked else "#ffcc66") xalign 0.5
+
+    # tooltip 显示区
+    $ t = GetTooltip()
+    if t:
+        frame:
+            xalign 0.5
+            yalign 0.94
+            background Solid("#000000")
+            padding (16, 8)
+            text "[t]" size 22 color "#ffffff"
+
+    # 查看线索按钮
+    textbutton "查看线索":
+        xalign 0.98
+        yalign 0.84
+        background Solid("#222222")
+        hover_background Solid("#555555")
+        text_color "#ffffff"
+        text_hover_color "#ffcc66"
+        action Show("clue_log_screen")
+
+    # 结束调查按钮
+    textbutton "结束调查":
+        xalign 0.98
+        yalign 0.92
+        background Solid("#222222")
+        hover_background Solid("#555555")
+        text_color "#ffffff"
+        text_hover_color "#ffcc66"
+        action Jump("try_end_investigation")
+
+
+# ===== 章节结构 =====
+
+label start:
+    menu:
+        "【v2.2b TEMP】测试探索热点场景":
+            jump test_v22_explore
+        "正常剧情":
+            jump chapter_01_start
+
+label chapter_01_start:
+    call set_scene_room_test
+    jump intro_scene
+
+# v1.2 新增：场景设置 label
+label set_scene_room_test:
+    $ chapter_id = "chapter_01"
+    $ scene_id = "scene_rainy_room"
+    $ scene_title = "雨夜房间"
+    $ current_objective = "调查房间，弄清这通电话和养老院的关系。"
+    return
+
+label intro_scene:
+
+    scene black with fade
+    pause 0.7
+
+    scene bg_rainy_room with dissolve
+    pause 0.6
+
+    play music "audio/rain_loop.wav" loop fadein 2.0
+    $ renpy.music.set_volume(0.25, delay=0.0, channel="music")
+
+    n "雨下了一整晚。"
+    pause 0.6
+
+    $ renpy.music.set_volume(0.8, delay=0.2, channel="music")
+    pause 0.4
+    $ renpy.music.set_volume(0.25, delay=0.3, channel="music")
+
+    n "周卫国坐在出租屋里，桌上的烟灰缸已经满了。"
+    n "手机屏幕忽然亮了一下。"
+
+    show phone_on:
+        xpos 1150 ypos 530
+    with dissolve
+    show phone_glow_strong:
+        xpos 1145 ypos 525
+    pause 0.15
+    hide phone_glow_strong
+    show phone_on:
+        xpos 1150 ypos 530
+
+    pause 0.5
+
+    show char_placeholder at center with dissolve
+
+    l "这个点，谁还会找我？"
+    pause 0.6
+
+    jump room_investigation_intro
+
+label room_investigation_intro:
+
+    n "电话没有立刻响。"
+    n "屋里只有雨声，还有桌上那张被压皱的养老院宣传单。"
+    n "你决定先看看四周。"
+
+    jump room_investigation
+
+# v0.8 改造：用 show screen + pause 替代 call screen，让 hide screen 能正确生效
+label room_investigation:
+
+    scene bg_rainy_room
+    show screen room_explore_screen
+    $ renpy.pause(hard=True)
+
+# --- 调查：手机 ---
+label investigate_phone:
+
+    hide screen room_explore_screen
+
+    if not clue_phone_checked:
+        $ clue_phone_checked = True
+        $ add_clue("phone_no_record", "没有记录的来电", "手机没有未接来电，也没有新短信，但屏幕亮起的时间停在了 23:17。")
+        n "手机屏幕还亮着。"
+        n "没有未接来电，也没有新短信。"
+        n "可屏幕上方的时间，停在了 23:17。"
+    else:
+        n "手机没有新的记录。"
+        n "23:17 这个时间，像是被钉在了屏幕上。"
+
+    jump check_investigation_progress
+
+# --- 调查：门口 ---
+label investigate_door:
+
+    hide screen room_explore_screen
+
+    if not clue_door_checked:
+        $ clue_door_checked = True
+        $ add_clue("door_water", "门缝下的水迹", "门缝下面有一小片水迹，像是有人在雨夜站在门外停留过。")
+        n "门锁好好的。"
+        n "门缝下面有一小片水迹。"
+        n "水迹不是从屋里流出去的，是从外面渗进来的。"
+    else:
+        n "门外没有动静。"
+        n "那片水迹还在。"
+
+    jump check_investigation_progress
+
+# --- 调查：窗户 ---
+label investigate_window:
+
+    hide screen room_explore_screen
+
+    if not clue_window_checked:
+        $ clue_window_checked = True
+        $ add_clue("car_downstairs", "楼下没熄火的车", "雨夜里，楼下停着一辆没熄火的黑车，车灯一直亮着。")
+        n "窗外的雨很密。"
+        n "楼下停着一辆没熄火的黑车。"
+        n "车灯没有关，像是在等人。"
+    else:
+        n "那辆车还停在楼下。"
+        n "车灯照着雨水，像一双睁着的眼睛。"
+
+    jump check_investigation_progress
+
+# --- 调查：桌子 ---
+label investigate_table:
+
+    hide screen room_explore_screen
+
+    if not clue_table_checked:
+        $ clue_table_checked = True
+        $ add_clue("nursing_home_leaflet", "养老院祝寿活动宣传单", "宣传单上写着：明天上午九点，祝寿活动。纸角被雨水洇湿。")
+        n "桌上压着一张养老院宣传单。"
+        n "纸角被雨水洇湿，已经卷起来。"
+        n "最下面一行写着：明天上午九点，祝寿活动。"
+    else:
+        n "宣传单还压在桌上。"
+        n "“祝寿”两个字，被水洇得有些发暗。"
+
+    jump check_investigation_progress
+
+# --- 调查进度检查 ---
+label check_investigation_progress:
+
+    jump room_investigation
+
+# --- v0.8 玩家主动结束调查 ---
+label try_end_investigation:
+
+    hide screen room_explore_screen
+
+    if clue_phone_checked and clue_table_checked:
+        n "你把手机和那张养老院宣传单放在一起看。"
+        n "就在这时，手机突然响了。"
+        jump phone_event
+    else:
+        n "现在还不能离开。"
+        n "你总觉得还有什么东西没看。"
+        jump room_investigation
+
+# ===== 后续保留 v0.6 演出 =====
+
+label phone_event:
+
+    hide phone_on
+    show phone_off:
+        xpos 1150 ypos 530
+    pause 0.3
+
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    play sound "audio/phone_ring.wav"
+    $ renpy.music.set_volume(0.10, delay=0.2, channel="music")
+
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_on:
+        xpos 1150 ypos 530
+    pause 0.16
+    show phone_ring_flash:
+        xpos 1150 ypos 530
+    pause 0.16
+
+    show phone_on:
+        xpos 1150 ypos 530
+
+    $ renpy.music.set_volume(0.25, delay=0.3, channel="music")
+    pause 0.3
+
+    jump phone_choice
+
+label phone_choice:
+
+    menu:
+        "接电话":
+            $ phone_answered = True
+            jump answer_phone
+
+        "不接电话":
+            $ phone_answered = False
+            jump ignore_phone
+
+label answer_phone:
+
+    stop sound
+
+    show phone_glow_strong:
+        xpos 1145 ypos 525
+    pause 0.2
+    hide phone_glow_strong
+    show phone_on:
+        xpos 1150 ypos 530
+
+    pause 0.5
+
+    n "你把手机贴到耳边，雨声像是一下子远了。"
+
+    $ renpy.music.set_volume(0.15, delay=0.4, channel="music")
+
+    n "电话那头没有立刻说话。"
+    l "喂？哪位？"
+
+    pause 0.8
+
+    n "几秒钟后，一个很低的声音贴着听筒响起："
+
+    scene black with dissolve
+    pause 0.25
+    scene bg_rainy_room with dissolve
+    show phone_on:
+        xpos 1150 ypos 530
+
+    n "“明天别去养老院。”"
+
+    $ renpy.music.set_volume(0.25, delay=0.5, channel="music")
+
+    jump chapter_01_after_phone
+
+label ignore_phone:
+
+    stop sound
+
+    hide phone_on
+    hide phone_ring_flash
+    show phone_off:
+        xpos 1150 ypos 530
+    with dissolve
+
+    pause 0.7
+
+    n "你没有接。"
+    n "手机屏幕暗下去，房间像是突然空了一块。"
+
+    $ renpy.music.set_volume(0.30, delay=0.2, channel="music")
+    pause 0.5
+    $ renpy.music.set_volume(0.20, delay=0.3, channel="music")
+
+    pause 0.6
+
+    n "雨声变得很重。"
+
+    play sound "audio/knock.wav"
+
+    n "门外响了三下。"
+    n "不轻不重，像是在确认你在不在。"
+
+    pause 0.5
+
+    show black_overlay with dissolve
+    pause 0.25
+    hide black_overlay with dissolve
+
+    jump chapter_01_after_phone
+
+# ===== v1.4 新增：第二场景 养老院活动室 =====
+
+label set_scene_nursing_home_activity_room:
+    $ chapter_id = "chapter_01"
+    $ scene_id = "scene_nursing_home_activity_room"
+    $ scene_title = "养老院活动室"
+    $ current_objective = "调查活动室，确认“祝寿”活动的异常。"
+    return
+
+label chapter_01_after_phone:
+
+    # v2.2n: 切换到养老院活动室背景，避免"第二天上午"仍配雨夜出租屋
+    stop music fadeout 1.5
+    scene black with fade
+    pause 0.5
+    scene bg_activity_room with dissolve
+    pause 0.4
+
+    n "第二天上午，雨还没停。"
+    n "周卫国照着宣传单上的地址，来到了那家养老院。"
+    n "活动室里已经摆好了红色横幅。"
+    n "墙上写着两个大字：祝寿。"
+
+    call set_scene_nursing_home_activity_room
+    jump nursing_home_activity_room_intro
+
+label nursing_home_activity_room_intro:
+
+    scene bg_activity_room with dissolve
+
+    n "活动室里有一股潮湿的消毒水味。"
+    n "几把塑料椅子靠墙摆着，像是刚刚有人坐过。"
+    n "你决定先看看这个房间。"
+
+    jump nursing_home_activity_room_investigation_intro
+
+# ===== v2.2a 横向探索场景测试入口 =====
+# 测试入口已在 explore_scene.rpy 中定义：label test_v22_explore
+# 可通过 Ren'Py 启动器直接 Jump 到 test_v22_explore 进行测试
+
