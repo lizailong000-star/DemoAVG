@@ -217,8 +217,22 @@ label start:
     menu:
         "【v2.2b TEMP】测试探索热点场景":
             jump test_v22_explore
+        "【V0.3a TEST】generated_hotspots 测试":
+            jump test_generated_hotspots
         "正常剧情":
             jump chapter_01_start
+
+label test_generated_hotspots:
+
+    scene bg_rainy_room
+    call screen hotspots_scene_bg_room_rainy
+
+    return
+
+label test_label:
+
+    n "你点击了 AVGBuilder 生成的测试热区。"
+    jump test_generated_hotspots
 
 label chapter_01_start:
     call set_scene_room_test
