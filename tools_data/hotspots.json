@@ -1,0 +1,23 @@
+{
+  "version": "0.1b",
+  "project_name": "DemoAVG",
+  "scenes": [
+    {
+      "scene_id": "scene_bg_room_rainy",
+      "background": "game/images/bg/bg_room_rainy.png",
+      "hotspots": [
+        {
+          "id": "test_hotspot",
+          "name": "测试热区",
+          "target_label": "test_label",
+          "tooltip": "测试提示",
+          "x": 10,
+          "y": 20,
+          "w": 100,
+          "h": 80,
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}
